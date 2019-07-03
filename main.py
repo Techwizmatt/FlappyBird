@@ -2,146 +2,188 @@ import pygame
 import random
 import numpy as np
 
-pygame.init()
+def getHitPoints(x,y,width,height):
+    xLoc = list(range((int(x) - int(width / 2)), (int(x) + int(width / 2))))
+    yLoc = list(range((int(y) - int(height / 2)), (int(y) + int(height / 2))))
 
-screenWidth = 480
-screenHeight = 640
+    HitPoints = []
 
-screen = pygame.display.set_mode((screenWidth, screenHeight))
-pygame.display.set_caption('Flappy Bird')
+    for x1 in xLoc:
+        for y1 in yLoc:
+            HitPoints.append([x1, y1])
 
-# Background
-backgroundHeight = 480
-backgroundWidth = 580
+    return HitPoints
 
-background = pygame.image.load('assets/background.png').convert()
-background = pygame.transform.scale(background, (backgroundHeight, backgroundWidth))
 
-# Ground
-groundWidth = 25
-groundHeight = 80
+def common_data(list1, list2):
+    result = False
 
-ground = pygame.image.load('assets/ground.png').convert()
-ground = pygame.transform.scale(ground, (groundWidth, groundHeight))
+    # traverse in the 1st list
+    for x in list1:
 
-# Pipes
+        # traverse in the 2nd list
+        for y in list2:
 
-pipeWidth = 100
-pipeHeight = 700
+            # if one common
+            if x == y:
+                result = True
+                return result
 
-pipe = pygame.image.load('assets/pipe.png').convert()
-pipe = pygame.transform.scale(pipe, (pipeWidth, pipeHeight))
+    return result
 
-rPipe = pygame.transform.rotate(pipe, 180)
+def start():
+    screenWidth = 480
+    screenHeight = 640
 
-# Bird
+    pygame.init()
 
-birdArray = [pygame.image.load('assets/bird0.png').convert_alpha(),pygame.image.load('assets/bird1.png').convert_alpha(),pygame.image.load('assets/bird2.png').convert_alpha()]
+    screen = pygame.display.set_mode((screenWidth, screenHeight))
+    pygame.display.set_caption('Flappy Bird')
 
-birdWidth = 70
-birdHeight = 50
-birdX = (screenWidth / 2) - birdWidth
-birdY = (screenHeight / 2) - birdHeight
-birdFlap = 0
-birdRotation = 0
+    # Background
+    backgroundHeight = 480
+    backgroundWidth = 580
 
-birdSpriteRect = pygame.Rect(0,0,0,0)
-
-running = True  # Wether or not the game should be open or closed.
-started = False  # Wether or not the player is playing the game.
-pipeDisplacment = 200  # The height the bird has to fit within the pipe.
-pipeDistance = 300  # The width between the pipes within the surface.
-frameRate = 60  # Also known as FPS.
-movingSpeed = 3  # How many ticks (milliseconds) should pass before the next movement of the screen. (pipes, ground)
-
-pipesPlacement = []
-pipesHeight = []
-
-for i in range(0,10000):
-    pipesPlacement.append(screenWidth)
-    pipesHeight.append((random.randint(300,500)))
-
-xPos = 0;
-xPipePos = 0
-
-clock = pygame.time.Clock()
-
-while running:
-
-    screen.blit(background, (0, 0))  # Paint the background to the surface (canvas) at the X0, Y0 pos.
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            if started:
-                print("Jump up")
-            else:
-                print("Jump up and start the game")
-                started = True
-
-    # screen.blit(birdArray[birdFlap],(0,0))
-
-    # The game has started so we can start the creation of the pipes.
-
-    if started:
-
-    # Pipes
-        pipeCreation = (pipeDistance / movingSpeed) * movingSpeed
-
-        pipeNumber = int(xPipePos / pipeCreation)
-
-        xPipePos = xPipePos + movingSpeed
-
-        min = pipeNumber - 5
-
-        if min < 0:
-            min = 0
-
-        for i in range(min, pipeNumber):
-
-            x = pipesPlacement[i]
-            pipesPlacement[i] = pipesPlacement[i] - movingSpeed
-
-            screen.blit(pipe, (x, pipesHeight[i]))
-            screen.blit(rPipe, (x, (pipesHeight[i] - pipeHeight) - pipeDisplacment))
+    background = pygame.image.load('assets/background.png').convert()
+    background = pygame.transform.scale(background, (backgroundHeight, backgroundWidth))
 
     # Ground
-    for i in range(int(xPos / groundWidth), int((screenWidth / groundWidth) + xPos)):
-        screen.blit(ground, ((i * groundWidth) - xPos, screenHeight - groundHeight))
+    groundWidth = 25
+    groundHeight = 80
+
+    ground = pygame.image.load('assets/ground.png').convert()
+    ground = pygame.transform.scale(ground, (groundWidth, groundHeight))
+
+    # Pipes
+
+    pipeWidth = 100
+    pipeHeight = 700
+
+    pipe = pygame.image.load('assets/pipe.png').convert_alpha()
+    pipe = pygame.transform.scale(pipe, (pipeWidth, pipeHeight))
+
+    rPipe = pygame.transform.rotate(pipe, 180)
 
     # Bird
 
-    if xPos % 4 == 0:
-        birdFlap = birdFlap + 1
+    birdArray = [pygame.image.load('assets/bird0.png').convert_alpha(),
+                 pygame.image.load('assets/bird1.png').convert_alpha(),
+                 pygame.image.load('assets/bird2.png').convert_alpha()]
 
-        if birdFlap >= 3:
-            birdFlap = 0
+    birdWidth = 70
+    birdHeight = 50
+    birdX = (screenWidth / 2) - birdWidth
+    birdY = (screenHeight / 2) - birdHeight
+    birdFlap = 0
+    birdRotation = 0
 
-    birdSprite = pygame.transform.rotate(pygame.transform.scale(birdArray[birdFlap], (birdWidth, birdHeight)),birdRotation)
+    birdSpriteRect = pygame.Rect(0, 0, 0, 0)
 
-    birdSpriteRect = birdSprite.get_rect()
+    running = True  # Wether or not the game should be open or closed.
+    started = False  # Wether or not the player is playing the game.
+    pipeDisplacment = 200  # The height the bird has to fit within the pipe.
+    pipeDistance = 300  # The width between the pipes within the surface.
+    frameRate = 60  # Also known as FPS.
+    movingSpeed = 3  # How many ticks (milliseconds) should pass before the next movement of the screen. (pipes, ground)
 
-    screen.blit(birdSprite, (birdX, birdY))
+    pipesPlacement = []
+    pipesHeight = []
 
-    xPos = xPos + movingSpeed
-    # Update the display (canvas or surface)
-    pygame.display.update()
+    for i in range(0, 10000):
+        pipesPlacement.append(screenWidth)
+        pipesHeight.append((random.randint(300, 500)))
 
-    # Set the frame rate of the game
-    clock.tick(frameRate)
+    xPos = 0;
+    xPipePos = 0
 
-def collisionDetection(oneX,oneY,oneWidth,oneHeight,twoX,twoY,twoWidth,One)->bool:
+    clock = pygame.time.Clock()
+
+    while running:
+
+        screen.blit(background, (0, 0))  # Paint the background to the surface (canvas) at the X0, Y0 pos.
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                if started:
+                    print("Jump up")
+                else:
+                    print("Jump up and start the game")
+                    started = True
+
+        # screen.blit(birdArray[birdFlap],(0,0))
+
+        # The game has started so we can start the creation of the pipes.
+
+        if started:
+
+            # Pipes
+            pipeCreation = (pipeDistance / movingSpeed) * movingSpeed
+
+            pipeNumber = int(xPipePos / pipeCreation)
+
+            xPipePos = xPipePos + movingSpeed
+
+            min = pipeNumber - 5
+
+            if min < 0:
+                min = 0
+
+            for i in range(min, pipeNumber):
+                # Screen generation
+
+                tempBottomPipe = pipe
+                tempTopPipe = rPipe
+
+                x = pipesPlacement[i]
+                pipesPlacement[i] = pipesPlacement[i] - movingSpeed
+
+                screen.blit(tempBottomPipe, (x, pipesHeight[i]))
+                screen.blit(tempTopPipe, (x, (pipesHeight[i] - pipeHeight) - pipeDisplacment))
+
+                # Hit Detection
+
+                # birdLocList = getHitPoints(birdX, birdY, birdWidth, birdHeight)
+                #
+                # bottomPipeLocList = getHitPoints(x,pipesHeight[i], pipeWidth, pipeHeight)
+                # topPipeLocList = getHitPoints(x,((pipesHeight[i] - pipeHeight) - pipeDisplacment),pipeWidth,pipeHeight)
+                #
+                # if common_data(birdLocList,topPipeLocList):
+                #     print("HITTT!!")
+
+                print(tempTopPipe.get_rect())
+                print(birdSprite.get_rect())
+
+                #ISSUES UGGHH
 
 
 
-    return False
+        # Ground
+        for i in range(int(xPos / groundWidth), int((screenWidth / groundWidth) + xPos)):
+            screen.blit(ground, ((i * groundWidth) - xPos, screenHeight - groundHeight))
 
-def grabSidePointsRect(x,y,width,height):
+        # Bird
 
-    points = []
+        if xPos % 4 == 0:
+            birdFlap = birdFlap + 1
 
-    points.append()
+            if birdFlap >= 3:
+                birdFlap = 0
 
+        birdSprite = pygame.transform.rotate(pygame.transform.scale(birdArray[birdFlap], (birdWidth, birdHeight)),
+                                             birdRotation)
 
+        birdSpriteRect = birdSprite.get_rect()
+
+        screen.blit(birdSprite, (birdX, birdY))
+
+        xPos = xPos + movingSpeed
+        # Update the display (canvas or surface)
+        pygame.display.update()
+
+        # Set the frame rate of the game
+        clock.tick(frameRate)
+
+start()
